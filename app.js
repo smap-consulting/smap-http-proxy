@@ -22,6 +22,9 @@ app.get('/', function(req, res) {
 
 // proxy formList route
 app.get('/formList', function(req, res) {
+  console.log('fetching formList');
+  res.set('Content-Type', 'text/xml');
+
   request.get(hostname + '/formList', {
     auth: credentials
   }, function(err, response, body) {
@@ -31,6 +34,31 @@ app.get('/formList', function(req, res) {
       res.send(body);
     }
   });
+
+});
+
+app.get('/formXML', function(req, res) {
+  console.log('fetching form key = %d', req.query.key);
+  res.set('Content-Type', 'text/xml');
+
+  var query = {
+    key: req.query.key
+  };
+
+  request.get(hostname + '/formXML', {
+    auth:credentials,
+    qs: query
+  }, function (err, response, body) {
+    console.log(response);
+    if (err) {
+      console.log('error: ', err);
+      res.send(err);
+    } else {
+      console.log('body: ', body)
+      res.send(body);
+    }
+  });
+
 });
 
 var server = app.listen(app.get('port'), function() {
