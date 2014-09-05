@@ -9,11 +9,18 @@ app.set('port', (process.env.PORT || 5000));
 var username = process.env.SMAP_USERNAME;
 var password = process.env.SMAP_PASSWORD;
 var hostname = process.env.SMAP_HOST_NAME;
+var proxyHostName = process.env.PROXY_HOST_NAME;
 
 var credentials = {
   user: username,
   pass: password,
   sendImmediately: false
+};
+
+// replace the smap survey hostname with the proxy hostname
+function replaceHostname(body) {
+  var replacePattern = new RegExp(hostname, 'g');
+  return body.replace(replacePattern, proxyHostName);
 };
 
 app.get('/', function(req, res) {
@@ -31,7 +38,8 @@ app.get('/formList', function(req, res) {
     if (err) {
       res.send(err);
     } else {
-      res.send(body);
+      var newBody = replaceHostname(body);
+      res.send(newBody);
     }
   });
 

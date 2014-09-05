@@ -30,6 +30,7 @@ npm install
 export SMAP_USERNAME=myuser
 export SMAP_PASSWORD=mypassword
 export SMAP_HOST_NAME=http://mysmap.smap.com.au
+export PROXY_HOST_NAME=http://localhost:5000
 
 # run the app
 forever -w app.js
@@ -41,4 +42,5 @@ Environment Variables
 `SMAP_USERNAME` - Username for your SMAP instance
 `SMAP_PASSWORD` - Password for your SMAP instance
 `SMAP_HOST_NAME` - Hostname for your SMAP server instance
+`PROXY_HOST_NAME` - Hostname for the proxy
 `PORT` - Defaults to 5000, provided by heroku
