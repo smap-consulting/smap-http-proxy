@@ -1,0 +1,23 @@
+{
+  "name": "smap-proxy",
+  "version": "0.0.1",
+  "description": "Proxy Server for SMAP Server",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "smap",
+    "http",
+    "http-digest"
+  ],
+  "author": "SMAP Consulting",
+  "license": "GNU",
+  "dependencies": {
+    "express": "^4.8.7",
+    "request": "^2.42.0"
+  },
+  "devDependencies": {
+    "forever": "^0.11.1"
+  }
+}
