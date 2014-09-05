@@ -39,8 +39,8 @@ forever -w app.js
 Environment Variables
 ---------------------
 
-`SMAP_USERNAME` - Username for your SMAP instance
-`SMAP_PASSWORD` - Password for your SMAP instance
-`SMAP_HOST_NAME` - Hostname for your SMAP server instance
-`PROXY_HOST_NAME` - Hostname for the proxy
-`PORT` - Defaults to 5000, provided by heroku
+- `SMAP_USERNAME` - Username for your SMAP instance
+- `SMAP_PASSWORD` - Password for your SMAP instance
+- `SMAP_HOST_NAME` - Hostname for your SMAP server instance
+- `PROXY_HOST_NAME` - Hostname for the proxy
+- `PORT` - Defaults to 5000, provided by heroku
