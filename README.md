@@ -1,5 +1,7 @@
 # SMAP Server Proxy
 
+[ ![Codeship Status for smap-consulting/smap-http-proxy](https://www.codeship.io/projects/01673190-16e0-0132-af64-5ae52864a4c1/status)](https://www.codeship.io/projects/33960)
+
 Dependencies
 ------------
 
