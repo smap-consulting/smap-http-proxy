@@ -1,15 +1,17 @@
-var username, password;
-
 var express = require('express');
-var request = require('request');
+var Promise = require('bluebird');
+var request = Promise.promisify(require('request'));
+var logger = require('morgan')('dev');
 
 var app = express();
+app.use(logger);
+
 app.set('port', (process.env.PORT || 5000));
 
-var username = process.env.SMAP_USERNAME;
-var password = process.env.SMAP_PASSWORD;
-var hostname = process.env.SMAP_HOST_NAME;
-var proxyHostName = process.env.PROXY_HOST_NAME;
+var username      = loadEnv('SMAP_USERNAME');
+var password      = loadEnv('SMAP_PASSWORD');
+var hostname      = loadEnv('SMAP_HOST_NAME');
+var proxyHostName = loadEnv('PROXY_HOST_NAME');
 
 var credentials = {
   user: username,
@@ -17,58 +19,41 @@ var credentials = {
   sendImmediately: false
 };
 
-// replace the smap survey hostname with the proxy hostname
+function loadEnv(key) {
+  var environmentVariable = process.env[key];
+
+  if (environmentVariable) {
+    return environmentVariable;
+  }
+  console.err('Environment variable', key, 'not set. Exiting');
+  process.exit(1); // fail fast
+}
+
 function replaceHostname(body) {
   var replacePattern = new RegExp(hostname, 'g');
   return body.replace(replacePattern, proxyHostName);
 };
 
-app.get('/', function(req, res) {
-  res.send('Server up');
-});
+app.all('/*', function (req, res) {
+  var proxyUrl = hostname + req.url;
 
-// proxy formList route
-app.get('/formList', function(req, res) {
-  console.log('fetching formList');
-  res.set('Content-Type', 'text/xml');
+  request(proxyUrl, {
+    auth: credentials,
+    followRedirect: true,
+    maxRedirects: 10,
+    method: req.method
+  }).spread(function(response, body) {
 
-  request.get(hostname + '/formList', {
-    auth: credentials
-  }, function(err, response, body) {
-    if (err) {
-      res.send(err);
-    } else {
-      var newBody = replaceHostname(body);
-      res.send(newBody);
-    }
+    console.log(req.method, response.request.href, response.statusCode);
+
+    res.set('Content-Type', response.headers['content-type']);
+    res.status(response.statusCode);
+
+    // rewrite references to the target server to refer to this server
+    res.send(replaceHostname(body));
   });
-
 });
 
-app.get('/formXML', function(req, res) {
-  console.log('fetching form key = %d', req.query.key);
-  res.set('Content-Type', 'text/xml');
-
-  var query = {
-    key: req.query.key
-  };
-
-  request.get(hostname + '/formXML', {
-    auth:credentials,
-    qs: query
-  }, function (err, response, body) {
-    console.log(response);
-    if (err) {
-      console.log('error: ', err);
-      res.send(err);
-    } else {
-      console.log('body: ', body)
-      res.send(body);
-    }
-  });
-
-});
-
-var server = app.listen(app.get('port'), function() {
-    console.log('Listening on port %d', server.address().port);
+var server = app.listen(app.get('port'), function () {
+  console.log('Listening on port %d', server.address().port);
 });
