@@ -19,42 +19,10 @@ var credentials = {
   sendImmediately: false
 };
 
-function ignoreHeader(key) {
-  return _.contains(['accept-encoding', 'cookie'], key);
-}
-
-function extractHeaders(req) {
-  return _.transform(req.headers, function(headers, value, key) {
-    if (ignoreHeader(key)) {
-      return undefined;
-    }
-
-    if(key == 'host') {
-      headers['host'] = config.hostname.replace('http://', '')
-    } else {
-      headers[key] = value;
-    }
-  });
-}
-
 function replaceHostname(body) {
   var replacePattern = new RegExp(config.hostname , 'g');
   return body.replace(replacePattern, config.proxyHostName);
 }
-
-app.use(function (req, res, next) {
-  getRawBody(req, {
-    length: req.headers['content-length'],
-    limit: '1mb'
-  }, function (err, body) {
-    if (err) {
-      return next(err);
-    }
-
-    req.body = body;
-    next();
-  });
-});
 
 // proxy formList route
 app.get('/formList', function(req, res) {
@@ -65,6 +33,7 @@ app.get('/formList', function(req, res) {
     auth: credentials
   }, function(err, response, body) {
     if (err) {
+      console.error('error: ', err);
       res.send(err);
     } else {
       res.send(body);
@@ -87,7 +56,7 @@ app.get('/formXML', function(req, res) {
   }, function (err, response, body) {
     console.log(response);
     if (err) {
-      console.log('error: ', err);
+      console.error('error: ', err);
       res.send(err);
     } else {
       console.log('body: ', body)
@@ -95,6 +64,12 @@ app.get('/formXML', function(req, res) {
     }
   });
 
+});
+
+app.post('/submission', function(req, res) {
+  req.pipe(request(config.hostname + '/submission', {
+    auth: credentials
+  })).pipe(res);
 });
 
 var server = app.listen(app.get('port'), function () {
