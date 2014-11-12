@@ -24,6 +24,11 @@ function replaceHostname(body) {
   return body.replace(replacePattern, config.proxyHostName);
 }
 
+// health check
+app.get('/', function (req, res) {
+  res.send('Proxy up and running');
+});
+
 // proxy formList route
 app.get('/formList', function(req, res) {
   console.log('fetching formList');
