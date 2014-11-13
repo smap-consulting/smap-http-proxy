@@ -41,7 +41,7 @@ app.get('/formList', function(req, res) {
       console.error('error: ', err);
       res.send(err);
     } else {
-      res.send(body);
+      res.send(replaceHostname(body));
     }
   });
 
